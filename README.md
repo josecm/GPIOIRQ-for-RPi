@@ -17,7 +17,7 @@ each one representing one gpio present on the raspberry pi header.
 
 /* HOW TO USE IT */
 
-In your application you will first need to insert the fcntl.h, signal.h and "gpioirq.h" headers.
+In your application you will first need to define _GNU_SOURCE and insert the fcntl.h (by that order), signal.h and "gpioirq.h" headers.
 
 You will need to follow these steps to configure your program to receive interrupts from the pins:
 
