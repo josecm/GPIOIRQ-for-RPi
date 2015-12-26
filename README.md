@@ -29,7 +29,7 @@ The handler should follow the int (*handler)(int, siginfo_t, void*) signature an
 5) Use fcntl operation, F_GETFL and F_SETFL, to enable signal-driven io by seting the O_ASYNC file status flag.
 6) Optionally use ioctl operations, GPIOIRQ_IOC_SETTYPE and GPIO_IOC_SETPULL, to configure the type of event that generates the interrupt (default is falling edge) or pull-up/down (default is no pull-up/down) on the pin you are using. The flags to pass as arguments to this commands are defined in gpioirq.h.
 
-The devices created can only be opened by one process at a time.
+Note: The devices created can only be opened by one process at a time.
 
 An example of how to use this devices is provided in the test_module.c program.
 
