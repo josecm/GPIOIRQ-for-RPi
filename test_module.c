@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
-#include "gpio_irq.h"
+#include "gpioirq.h"
 
 int fd_pin22, fd_pin26;
 
@@ -52,20 +52,20 @@ int main(int argc, char **argv){
 
 	signal(SIGINT, closeuphandle);
 
-	/* opens device associated um interrupt on gpio 22 */
+	/* opens device associated with interrupt on gpio 22 */
 	if((fd_pin22 = open("/dev/gpio_irq22", O_RDWR)) < 0){
 		perror("Failed to open /dev/gpio_irq22");
 		return -1;
 	}
 
 
-	/* opens device associated um interrupt on gpio 26 */
+	/* opens device associated with interrupt on gpio 26 */
 	if((fd_pin26 = open("/dev/gpio_irq26", O_RDWR)) < 0){
 		perror("Failed to open /dev/gpio_irq26");
 		return -1;
 	}
 
-	/*	registers the handle for SIGIO and asks for siginfo_t struct to be used*/
+	/*	registers the handler for SIGIO and asks for siginfo_t struct to be used*/
 	sig.sa_flags = SA_SIGINFO;
 	sigemptyset(&(sig.sa_mask));
 	sig.sa_sigaction = handler;	
@@ -74,19 +74,19 @@ int main(int argc, char **argv){
 		return -1;
 	}
 
-	/* Register the process to receive SIGIO signals related to fd_pin22 */
+	/* Register the process to receive SIGIO realtime signals related to fd_pin22 */
 	fcntl(fd_pin22, F_SETSIG, SIGIO);
 	fcntl(fd_pin22, F_SETOWN, getpid());
-	oflags = fcntl(fd, F_GETFL);
-	fcntl(fd_pi22, F_SETFL, oflags | FASYNC);
+	oflags = fcntl(fd_pin22, F_GETFL);
+	fcntl(fd_pin22, F_SETFL, oflags | O_ASYNC);
 
-	/* Register the process to receive SIGIO signals related to fd_pin26 */
+	/* Register the process to receive SIGIO realtime signals related to fd_pin26 */
 	fcntl(fd_pin26, F_SETSIG, SIGIO);
 	fcntl(fd_pin26, F_SETOWN, getpid());
 	oflags = fcntl(fd_pin26, F_GETFL);
-	fcntl(fd_pin26, F_SETFL, oflags | FASYNC);
+	fcntl(fd_pin26, F_SETFL, oflags | O_ASYNC);
 
-	/* Configures the irq on gpio 26 to react to rising edge - the default is falling edge */
+	/* Configures the irq on gpio 26 to react to rising edge*/
 	ioctl(fd_pin26, GPIOIRQ_IOC_SETTYPE, GPIOIRQ_RISING_EDGE);
 
 	printf("Waiting for GPIO interrupts through SIGIO signals... CTRL-C to exit.\n");

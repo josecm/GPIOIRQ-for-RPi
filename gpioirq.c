@@ -16,7 +16,7 @@
 #include <linux/slab.h>
 #include <linux/delay.h>
 
-#include "gpioirqdev.h"
+#include "gpioirq.h"
 
 #define CLASS_NAME "GPIO_IRQ"
 
@@ -105,34 +105,24 @@ static int gpioirq_settype(struct gpio_irq *gpir, unsigned long type){
 
 	unsigned long temp = 0;
 
-	printk("ioctl arg = 0x%x", type);
-	printk("gpir type = 0x%x", gpir->type);
-
-
 	if((type & GPIOIRQ_FALLING_EDGE) && !(gpir->type & type)){
-		printk(KERN_INFO "1\n");
 		temp = ioread32(gpio_base + GPFEN0);
 		temp |= (1 << gpir->pin);
 		iowrite32(temp, gpio_base + GPFEN0);
 		gpir->type |= GPIOIRQ_FALLING_EDGE;
 	} else if(!(type & GPIOIRQ_FALLING_EDGE) && (gpir->type & GPIOIRQ_FALLING_EDGE)){
-		printk(KERN_INFO "2\n");
 		temp = ioread32(gpio_base + GPFEN0);
-		printk(KERN_INFO "temp: 0x%x\n", temp);
 		temp &= ~(1 << gpir->pin);
-		printk(KERN_INFO "temp &= ~(1 << gpir->pin): 0x%x\n", temp);
 		iowrite32(temp, gpio_base + GPFEN0);
 		gpir->type &= ~GPIOIRQ_FALLING_EDGE;
 	}
 
 	if(type & GPIOIRQ_RISING_EDGE && !(gpir->type & type)){
-		printk(KERN_INFO "3\n");
 		temp = ioread32(gpio_base + GPREN0);
 		temp |= (1 << gpir->pin);
 		iowrite32(temp, gpio_base + GPREN0);
 		gpir->type |= GPIOIRQ_RISING_EDGE;
 	} else if(!(type & GPIOIRQ_RISING_EDGE) && (gpir->type & GPIOIRQ_RISING_EDGE)){
-		printk(KERN_INFO "4\n");
 		temp = ioread32(gpio_base + GPREN0);
 		temp &= ~(1 << gpir->pin);
 		iowrite32(temp, gpio_base + GPREN0);
@@ -140,13 +130,11 @@ static int gpioirq_settype(struct gpio_irq *gpir, unsigned long type){
 	}
 
 	if(type & GPIOIRQ_HIGH && !(gpir->type & type)){
-		printk(KERN_INFO "5\n");
 		temp = ioread32(gpio_base + GPHEN0);
 		temp |= (1 << gpir->pin);
 		iowrite32(temp, gpio_base + GPHEN0);
 		gpir->type |= GPIOIRQ_HIGH;
 	} else if(!(type & GPIOIRQ_HIGH) && (gpir->type & GPIOIRQ_HIGH)){
-		printk(KERN_INFO "6\n");
 		temp = ioread32(gpio_base + GPHEN0);
 		temp &= ~(1 << gpir->pin);
 		iowrite32(temp, gpio_base + GPHEN0);
@@ -154,14 +142,12 @@ static int gpioirq_settype(struct gpio_irq *gpir, unsigned long type){
 	}
 
 	if(type & GPIOIRQ_LOW && !(gpir->type & type)){
-		printk(KERN_INFO "7\n");
 		temp = ioread32(gpio_base + GPLEN0);
 		temp |= (1 << gpir->pin);
 		iowrite32(temp, gpio_base + GPLEN0);
 		gpir->type |= GPIOIRQ_LOW;
 
 	} else if(!(type & GPIOIRQ_LOW) && (gpir->type & GPIOIRQ_LOW)){
-		printk(KERN_INFO "8\n");
 		temp = ioread32(gpio_base + GPLEN0);
 		temp &= ~(1 << gpir->pin);
 		iowrite32(temp, gpio_base + GPLEN0);
@@ -306,7 +292,7 @@ static __init int my_init(void){
 		tempmajorminor = MKDEV(MAJOR(majorminor), i );
 		gpio_irq_list[i].majorminor = tempmajorminor;
 
-		if(IS_ERR(ret = device_create(gpioirq_class, NULL, tempmajorminor, NULL, device_name))){
+		if(IS_ERR(device_create(gpioirq_class, NULL, tempmajorminor, NULL, device_name))){
 			printk(KERN_INFO "Failed creating device...\n");
 			ret = PTR_ERR(gpioirq_class);
 			goto devicecreat_err;
@@ -333,6 +319,7 @@ static __init int my_init(void){
 	if((irqctrl_base = ioremap(ARMCTRL_IC_BASE, 0x28)) == NULL){
 		printk(KERN_INFO "Failed mapping interrupt control registers...\n");
 		ret = -1;
+		goto ioremap_err;
 	}
 
 	/* Enables interrupts for gpio 0-31*/
