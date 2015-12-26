@@ -24,7 +24,7 @@ You will need to follow these steps to configure your program to receive interru
 1) Open the device(s) associated with the gpios for which you want to receive the signal/interrupt.
 
 2) Register a signal handler for SIGIO, using the sigaction function and setting the SA_SIGINFO flag in the sigaction struct.
-The handler should follow the int (*handler)(int, siginfo_t, void*) signature and inside it you can distinguish among the various devices by reading the si_fd field in the siginfo_t struct and comparing it to your open file descriptors.
+The handler should follow the int (\*handler)(int, siginfo_t, void\*) signature and inside it you can distinguish among the various devices by reading the si_fd field in the siginfo_t struct and comparing it to your open file descriptors.
 
 3) Use fcntl operation, F_SETSIG, for each file descriptor to specify that a realtime signal should be delivered.
 
@@ -32,12 +32,12 @@ The handler should follow the int (*handler)(int, siginfo_t, void*) signature an
 
 5) Use fcntl operation, F_GETFL and F_SETFL, to enable signal-driven io by seting the O_ASYNC file status flag.
 
-6) Optionally use ioctl operations, GPIOIRQ_IOC_SETTYPE and GPIO_IOC_SETPULL, to configure the type of event that generates the interrupt (default is falling edge) or pull-up/down (default is no pull-up/down) on the pin you are using. The flags to pass as arguments to this commands are defined in gpioirq.h.
+6) Optionally use ioctl operations, GPIOIRQ_IOC_SETTYPE and GPIOIRQ_IOC_SETPULL, to configure the type of event that generates the interrupt (default is falling edge) or pull-up/down (default is no pull-up/down) on the pin you are using. The flags to pass as arguments to this commands are defined in gpioirq.h.
 
 Note: The devices created can only be opened by one process at a time.
 
 An example of how to use this devices is provided in the test_module.c program.
 
 
-Any feedback or suggestions is welcome!
+Any feedback or suggestions are welcome!
 José Martins - josemartins90@gmail.com
