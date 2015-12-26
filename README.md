@@ -1,5 +1,8 @@
 # GPIOIRQ-for-RPi
-Linux kernel module for Raspberry Pi enabling the use of GPIO as external interrupt sources
+
+Linux kernel module for Raspberry Pi enabling the use of GPIO as external interrupt sources.
+
+The processes with open devices associated with the driver receive a SIGIO singal when an interrupt on any of gpios is generated. A process with several opened devices (registered for multiple interrupts)
 
 
 /* Building and loading the module */
